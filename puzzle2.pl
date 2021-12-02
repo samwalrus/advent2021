@@ -32,3 +32,15 @@ test(X):-
 
 %%% csv_read_file('input2.csv', Rows, [functor(i),separator(0' )]),phrase(plan(p(F,D)),Rows),Total #=F*D.
 %%% csv_read_file('input2.csv', Rows, [functor(i),separator(0' )]), reverse(Rows,R),phrase(plan2(p(F,D,A)),R),Total #= F*D.
+
+%%% Fun:
+%%% Find a plan to get to a position
+% ?- length(Plan,L),phrase(plan2(p(10,4,A)),Plan).
+Plan = [i(forward, _A), i(forward, _B), i(down, A)],
+L = 3,
+A*_A#=_C,
+A*_B#=_D,
+_B+_A#=10,
+_D+_C#=4 .
+
+%First plan found says the length has to be 3,  and constraints on the 3 input values. (inverse).
