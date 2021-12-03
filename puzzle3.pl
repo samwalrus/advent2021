@@ -51,3 +51,26 @@ list_pred_tcount_([X|Xs],P_2,N0,N) :-
 %?- test(X),maplist(atom_codes,X,Codes),maplist(numbers_codes,Ns,Codes), Codes=[H|T],length(H,Len),numlist(1,Len,Numlist),maplist(ns_index_max_min(Ns),Numlist,Max,Min),binary_number(Max,Gamma),binary_number(Min,Ep),PC #= Gamma*Ep.
 
 %?- csv_read_file('input3.csv', Rows, [functor(i),separator(0' ),convert(false)]),maplist(i_atom,Rows,Atoms), maplist(atom_codes,Atoms,Codes),maplist(numbers_codes,Ns,Codes).
+
+%?csv_read_file('input3.csv', Rows, [functor(i),separator(0' ),convert(false)]),maplist(i_atom,Rows,Atoms), maplist(atom_codes,Atoms,Codes),maplist(numbers_codes,Ns,Codes),Codes=[H|T],length(H,Len),numlist(1,Len,Numlist),maplist(ns_index_max_min(Ns),Numlist,Max,Min),binary_number(Max,Gamma),binary_number(Min,Ep),PC #= Gamma*Ep.
+
+
+%%%Part 2.
+
+%?- csv_read_file('input3.csv', Rows, [functor(i),separator(0' ),convert(false)]),maplist(i_atom,Rows,Atoms), maplist(atom_codes,Atoms,Codes),maplist(numbers_codes,Ns,Codes).
+
+binlist(Ns):-
+    csv_read_file('input3.csv', Rows, [functor(i),separator(0' ),convert(false)]),
+    maplist(i_atom,Rows,Atoms),
+    maplist(atom_codes,Atoms,Codes),
+    maplist(numbers_codes,Ns,Codes).
+
+t_binlist(Ns):-
+    test(X),maplist(atom_codes,X,Codes),maplist(numbers_codes,Ns,Codes).
+
+binlist_oxrating([Oxrating],Oxrating,Index).
+binlist_oxrating(BinList,Oxrating,Index):-
+    ns_index_max_min(BinList,Index,MaxValue,MinValue),
+    filter(BinList,NewBinList),
+    Index2 #=Index+1,
+    binlist_oxrating(NewBinList,Oxrating,Index2).
