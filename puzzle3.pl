@@ -22,30 +22,22 @@ numbers_codes(Nums,Codes):-
 %?- csv_read_file('input3.csv', Rows, [functor(i),separator(0' )]).
 
 
-thing2(I,Ns,Firsts):-maplist(nth1(I),Ns,Firsts).
-
 list_mcommon_lcommon(List,MaxValue,MinValue):-
     aggregate_all(count, member(1,List), Result),
     aggregate_all(count, member(0,List), Result2),
+    dif(Result,Result2),
     pairs_keys_values(Pairs,[Result,Result2],[1,0]),
     list_to_assoc(Pairs,Assoc),
     max_assoc(Assoc, MaxKey, MaxValue),
     min_assoc(Assoc, MinKey, MinValue).
 
+list_mcommon_lcommon(List,1,1):-
+    aggregate_all(count, member(1,List), Result),
+    aggregate_all(count, member(0,List), Result).
+
 ns_index_max_min(Ns,I,MaxValue,MinValue):-
     maplist(nth1(I),Ns,Firsts),
     list_mcommon_lcommon(Firsts,MaxValue,MinValue).
-
-:- meta_predicate tcount(2,?,?).
-tcount(P_2,Xs,N) :-
-   N #>= 0,
-   list_pred_tcount_(Xs,P_2,0,N).
-
-:- meta_predicate list_pred_tcount_(?,2,?,?).
-list_pred_tcount_([]    , _ ,N ,N).
-list_pred_tcount_([X|Xs],P_2,N0,N) :-
-   if_(call(P_2,X), (N1 is N0+1, N1 #=< N), N1 = N0),
-   list_pred_tcount_(Xs,P_2,N1,N).
 
 
 %?- test(X),maplist(atom_codes,X,Codes),maplist(numbers_codes,Ns,Codes), Codes=[H|T],length(H,Len),numlist(1,Len,Numlist),maplist(ns_index_max_min(Ns),Numlist,Max,Min),binary_number(Max,Gamma),binary_number(Min,Ep),PC #= Gamma*Ep.
@@ -68,9 +60,54 @@ binlist(Ns):-
 t_binlist(Ns):-
     test(X),maplist(atom_codes,X,Codes),maplist(numbers_codes,Ns,Codes).
 
-binlist_oxrating([Oxrating],Oxrating,Index).
-binlist_oxrating(BinList,Oxrating,Index):-
+%binlist_oxrateing([],Oxrating,_Index):- writeln(broken).
+binlist_oxrateing([Oxrating],Oxrating,_Index).
+binlist_oxrateing(BinList,Oxrating,Index):-
     ns_index_max_min(BinList,Index,MaxValue,MinValue),
-    filter(BinList,NewBinList),
+    dif(MaxValue,MinValue),
+    filter(BinList,NewBinList,Index,MaxValue),
+    %length(NewBinList,Length),
+    %writeln(Length),
     Index2 #=Index+1,
-    binlist_oxrating(NewBinList,Oxrating,Index2).
+    binlist_oxrateing(NewBinList,Oxrating,Index2).
+
+binlist_oxrateing(BinList,Oxrating,Index):-
+    ns_index_max_min(BinList,Index,1,1),
+    filter(BinList,NewBinList,Index,1),
+    %length(NewBinList,Length),
+    %writeln(Length),
+    Index2 #=Index+1,
+    binlist_oxrateing(NewBinList,Oxrating,Index2).
+
+binlist_co2rateing([C02_rating],C02_rating,_Index).
+binlist_co2rateing(BinList,C02_rating,Index):-
+    ns_index_max_min(BinList,Index,MaxValue,MinValue),
+    dif(MaxValue,MinValue),
+    filter(BinList,NewBinList,Index,MinValue),
+    Index2 #=Index+1,
+    binlist_co2rateing(NewBinList,C02_rating,Index2).
+binlist_co2rateing(BinList,C02_rating,Index):-
+    ns_index_max_min(BinList,Index,1,1),
+    filter(BinList,NewBinList,Index,0),
+    Index2 #=Index+1,
+    binlist_co2rateing(NewBinList,C02_rating,Index2).
+
+
+nth_equal_t(Index,Elem,List,true):-
+    nth1(Index,List,Elem).
+
+nth_equal_t(Index,Elem1,List,false):-
+    nth1(Index,List,Elem2), dif(Elem1,Elem2).
+
+
+
+filter(BinList,NewBinList,Index,Elem):-
+    tfilter(nth_equal_t(Index,Elem),BinList,NewBinList).
+
+
+list_answer(Ns,A):-
+    binlist_oxrateing(Ns,Ox,1),
+    binlist_co2rateing(Ns,C,1),
+    binary_number(Ox,N1),
+    binary_number(C,N2),
+    A #= N1*N2.
