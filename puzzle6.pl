@@ -18,9 +18,7 @@ v_v1(0,6).
 v_v1(X,X1):- dif(X,0),X1 #= X-1.
 
 s_s1(Inputs,Outputs):-
-    aggregate_all(count, member(0,Inputs),Extras),
-    length(New,Extras),
-    maplist(=(8),New),
+    findall(8,member(0,Inputs),New),
     maplist(v_v1,Inputs,NewInputs),
     append(NewInputs,New,Outputs).
 
@@ -49,3 +47,18 @@ input(X):-
 %@ Action? 
 %@ Unknown action:  (h for help)
 %@ Action? .
+
+
+%?- input(X),input_days_fishes(X,256,F).
+%@ ERROR: Stack limit (1.0Gb) exceeded
+%@ ERROR:   Stack sizes: local: 0.2Gb, global: 0.5Gb, trail: 13.7Mb
+%@ ERROR:   Stack depth: 106, last-call: 6%, Choice points: 898,932
+%@ ERROR:   In:
+%@ ERROR:     [106] system:'$length'(_133532058, 116421)
+%@ ERROR:     [104] user:s_s1([length:899,229], _133532080)
+%@ ERROR:     [103] user:inputlist([length:1], _133532106)
+%@ ERROR:     [102] user:in([length:1], 166, [length:1], _133532136)
+%@ ERROR:     [101] user:in([length:1], 167, [length:1], _133532172)
+%@ ERROR: 
+%@ ERROR: Use the --stack_limit=size[KMG] command line option or
+%@ ERROR: ?- set_prolog_flag(stack_limit, 2_147_483_648). to double the limit.
